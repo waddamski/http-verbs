@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@
 package uk.gov.hmrc.play.http.logging
 
 import org.slf4j.MDC
-import play.api.libs.concurrent.Execution.defaultContext
 
 import scala.concurrent.ExecutionContext
 
+
 object MdcLoggingExecutionContext {
-  implicit def fromLoggingDetails(implicit loggingDetails: LoggingDetails): ExecutionContext =
-    new MdcLoggingExecutionContext(defaultContext, loggingDetails.mdcData)
+  implicit def fromLoggingDetails(implicit loggingDetails: LoggingDetails, ec: ExecutionContext): ExecutionContext =
+    new MdcLoggingExecutionContext(loggingDetails.mdcData)(ec)
 }
 
-class MdcLoggingExecutionContext(wrapped: ExecutionContext, mdcData: Map[String, String]) extends ExecutionContext {
+class MdcLoggingExecutionContext(mdcData: Map[String, String])(implicit wrapped: ExecutionContext) extends ExecutionContext {
 
   def execute(runnable: Runnable) {
     wrapped.execute(new RunWithMDC(runnable, mdcData))

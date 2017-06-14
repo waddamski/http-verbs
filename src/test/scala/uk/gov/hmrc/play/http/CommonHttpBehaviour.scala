@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.play.http.logging.{ConnectionTracing, LoggingDetails}
 
 import scala.collection.mutable
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait CommonHttpBehaviour extends ScalaFutures with Matchers with WordSpecLike {
 
@@ -40,7 +40,7 @@ trait CommonHttpBehaviour extends ScalaFutures with Matchers with WordSpecLike {
   val testRequestBody = "testRequestBody"
   val url = "http://some.url"
 
-  def response(returnValue: Option[String] = None, statusCode: Int = 200) = Future.successful(HttpResponse(statusCode, returnValue.map(Json.parse(_))))
+  def response(returnValue: Option[String] = None, statusCode: Int = 200) = Future.successful(HttpResponse(statusCode, returnValue.map(Json.parse)))
 
   val defaultHttpResponse = response()
 
@@ -85,7 +85,7 @@ trait ConnectionTracingCapturing extends ConnectionTracing {
 
   val traceCalls = mutable.Buffer[(String, String)]()
 
-  override def withTracing[T](method: String, uri: String)(body: => Future[T])(implicit ld: LoggingDetails) = {
+  override def withTracing[T](method: String, uri: String)(body: => Future[T])(implicit ld: LoggingDetails, ec: ExecutionContext) = {
     traceCalls += ((method, uri))
     body
   }

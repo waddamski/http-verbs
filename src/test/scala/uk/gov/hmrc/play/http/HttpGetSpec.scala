@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import play.twirl.api.Html
 import uk.gov.hmrc.play.http.hooks.HttpHook
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HttpGetSpec extends WordSpecLike with Matchers with ScalaFutures with CommonHttpBehaviour with IntegrationPatience with MockitoSugar {
 
@@ -70,10 +71,7 @@ class HttpGetSpec extends WordSpecLike with Matchers with ScalaFutures with Comm
       val testGet = new StubbedHttpGet(Future.successful(response))
       testGet.GET(url).futureValue shouldBe response
     }
-    "be able to return HTML responses" in new HtmlHttpReads {
-      val testGet = new StubbedHttpGet(Future.successful(new DummyHttpResponse(testBody, 200)))
-      testGet.GET(url).futureValue should be (an [Html])
-    }
+
     "be able to return objects deserialised from JSON" in {
       val testGet = new StubbedHttpGet(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
       testGet.GET[TestClass](url).futureValue should be (TestClass("t", 10))

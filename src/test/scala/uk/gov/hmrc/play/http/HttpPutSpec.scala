@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import play.api.libs.json.{Json, Writes}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HttpPutSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
 
@@ -41,10 +42,6 @@ class HttpPutSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
       val response = new DummyHttpResponse(testBody, 200)
       val testPut = new StubbedHttpPut(Future.successful(response))
       testPut.PUT(url, testObject).futureValue shouldBe response
-    }
-    "be able to return HTML responses" in new HtmlHttpReads {
-      val testPut = new StubbedHttpPut(Future.successful(new DummyHttpResponse(testBody, 200)))
-      testPut.PUT(url, testObject).futureValue should be (an [Html])
     }
     "be able to return objects deserialised from JSON" in {
       val testPut = new StubbedHttpPut(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))

@@ -39,26 +39,25 @@ object HmrcBuild extends Build {
 
 private object AppDependencies {
 
-  import play.sbt.PlayImport._
-  import play.core.PlayVersion
-
   val compile = Seq(
-    "com.typesafe.play" %% "play" % PlayVersion.current,
-    ws,
+    "com.typesafe.play" %% "play-json" % "2.5.15",
     "uk.gov.hmrc" %% "time" % "2.0.0",
     "uk.gov.hmrc" %% "http-exceptions" % "1.0.0"
   )
+
 
   trait TestDependencies {
     lazy val scope: String = "test"
     lazy val test: Seq[ModuleID] = ???
   }
 
+
+
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "com.typesafe.play" %% "play-specs2" % PlayVersion.current % scope,
+        "com.typesafe.play" %% "play-test" % "2.5.15" % scope,
+        "com.typesafe.play" %% "play-specs2" % "2.5.15" % scope,
         "commons-codec" % "commons-codec" % "1.7" % scope,
         "org.scalatest" %% "scalatest" % "2.2.4" % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,

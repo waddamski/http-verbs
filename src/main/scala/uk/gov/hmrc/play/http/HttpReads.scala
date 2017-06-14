@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 package uk.gov.hmrc.play.http
 
 import play.api.libs.json
-import play.api.libs.json.{JsNull, JsUndefined, JsValue}
-import play.twirl.api.Html
+import play.api.libs.json.{JsNull, JsValue}
 
 trait HttpReads[O] {
   def read(method: String, url: String, response: HttpResponse): O
 }
 
-object HttpReads extends HtmlHttpReads with OptionHttpReads with JsonHttpReads {
+object HttpReads extends OptionHttpReads with JsonHttpReads {
   // readRaw is brought in like this rather than in a trait as this gives it
   // compilation priority during implicit resolution. This means, unless
   // specified otherwise a verb call will return a plain HttpResponse
@@ -47,11 +46,6 @@ trait OptionHttpReads extends HttpErrorFunctions {
   }
 }
 
-trait HtmlHttpReads extends HttpErrorFunctions {
-  implicit val readToHtml: HttpReads[Html] = new HttpReads[Html] {
-    def read(method: String, url: String, response: HttpResponse) = Html(handleResponse(method, url)(response).body)
-  }
-}
 
 trait JsonHttpReads extends HttpErrorFunctions {
   implicit def readFromJson[O](implicit rds: json.Reads[O], mf: Manifest[O]): HttpReads[O] = new HttpReads[O] {

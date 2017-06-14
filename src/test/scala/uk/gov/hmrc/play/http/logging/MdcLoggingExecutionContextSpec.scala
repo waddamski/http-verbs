@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with Lon
 
             for (l <- 0 until logCount) {
               val mdc = Map("entry" -> s"${Thread.currentThread().getName}-$l")
-              logEventInsideAFutureUsing(new MdcLoggingExecutionContext(ExecutionContext.global, mdc))
+              logEventInsideAFutureUsing(new MdcLoggingExecutionContext(mdc)(ExecutionContext.global))
             }
 
             completionLatch.countDown()
@@ -133,7 +133,7 @@ class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with Lon
 
 
   def createAndInitialiseMdcTransportingExecutionContext(mdcData: Map[String, String]): MdcLoggingExecutionContext = {
-    val ec = new MdcLoggingExecutionContext(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1)), mdcData)
+    val ec = new MdcLoggingExecutionContext(mdcData)(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1)))
     initialise(ec)
     ec
   }

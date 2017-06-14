@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.play.http.logging
 
-import play.api.Logger
-import uk.gov.hmrc.play.http.{Upstream4xxResponse, HttpException}
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
+//import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
+import uk.gov.hmrc.play.http.{HttpException, Upstream4xxResponse}
+//import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent._
 import scala.util.{Failure, Success, Try}
 
 trait ConnectionTracing {
 
-  lazy val connectionLogger = Logger("connector")
+  lazy val connectionLogger = LoggerFactory.getLogger("connector")
 
-  def withTracing[T](method: String, uri: String)(body: => Future[T])(implicit ld: LoggingDetails): Future[T] = {
+  def withTracing[T](method: String, uri: String)(body: => Future[T])(implicit ld: LoggingDetails, ec: ExecutionContext): Future[T] = {
     val startAge = ld.age
     val f = body
     f.onComplete(logResult(ld, method, uri, startAge))

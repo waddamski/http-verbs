@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http.logging.filters
+package uk.gov.hmrc.play.http
 
-import play.api.mvc.RequestHeader
-import uk.gov.hmrc.play.http.HeaderCarrier
-
-trait FrontendLoggingFilter extends LoggingFilter {
-
-  override def buildLoggedHeaders(request: RequestHeader) = HeaderCarrier.fromHeadersAndSession(request.headers, Some(request.session))
-
+/**
+  * Standard HTTP Verbs
+  */
+trait HttpVerbs {
+  val GET = "GET"
+  val POST = "POST"
+  val PUT = "PUT"
+  val PATCH = "PATCH"
+  val DELETE = "DELETE"
+  val HEAD = "HEAD"
+  val OPTIONS = "OPTIONS"
 }
+
+object HttpVerbs extends HttpVerbs

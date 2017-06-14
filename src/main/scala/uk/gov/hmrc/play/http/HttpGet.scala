@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,23 @@ package uk.gov.hmrc.play.http
 
 import java.net.URLEncoder
 
-import play.api.http.HttpVerbs.{GET => GET_VERB}
+import uk.gov.hmrc.play.http.HttpVerbs.{GET => GET_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import uk.gov.hmrc.play.http.logging.{ConnectionTracing, MdcLoggingExecutionContext}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpGet extends HttpVerb with ConnectionTracing with HttpHooks {
 
   protected def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse]
 
-  def GET[A](url: String)(implicit rds: HttpReads[A], hc: HeaderCarrier): Future[A] =withTracing(GET_VERB, url) {
+  def GET[A](url: String)(implicit rds: HttpReads[A], hc: HeaderCarrier, ec: ExecutionContext): Future[A] =withTracing(GET_VERB, url) {
     val httpResponse = doGet(url)
     executeHooks(url, GET_VERB, None, httpResponse)
     mapErrors(GET_VERB, url, httpResponse).map(response => rds.read(GET_VERB, url, response))
   }
 
-  def GET[A](url: String, queryParams: Seq[(String, String)])(implicit rds: HttpReads[A], hc: HeaderCarrier): Future[A] = {
+  def GET[A](url: String, queryParams: Seq[(String, String)])(implicit rds: HttpReads[A], hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
     val queryString = makeQueryString(queryParams)
     if (url.contains("?")) {
       throw new UrlValidationException(url, s"${this.getClass}.GET(url, queryParams)", "Query parameters must be provided as a Seq of tuples to this method")

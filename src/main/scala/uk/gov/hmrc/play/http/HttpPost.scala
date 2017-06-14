@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package uk.gov.hmrc.play.http
 
 import play.api.libs.json.{Json, Writes}
-import play.api.http.HttpVerbs.{POST => POST_VERB}
+import uk.gov.hmrc.play.http.HttpVerbs.{POST => POST_VERB}
 import uk.gov.hmrc.play.http.hooks.{HttpHook, HttpHooks}
-import uk.gov.hmrc.play.http.logging.{MdcLoggingExecutionContext, ConnectionTracing}
-import MdcLoggingExecutionContext._
+import uk.gov.hmrc.play.http.logging.{ConnectionTracing, MdcLoggingExecutionContext}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpPost extends HttpVerb with ConnectionTracing with HttpHooks {
 
@@ -34,7 +33,7 @@ trait HttpPost extends HttpVerb with ConnectionTracing with HttpHooks {
 
   protected def doFormPost(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier): Future[HttpResponse]
 
-  def POST[I, O](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier): Future[O] = {
+  def POST[I, O](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doPost(url, body, headers)
       executeHooks(url, POST_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
@@ -42,7 +41,7 @@ trait HttpPost extends HttpVerb with ConnectionTracing with HttpHooks {
     }
   }
 
-  def POSTString[O](url: String, body: String, headers: Seq[(String,String)] = Seq.empty)(implicit rds: HttpReads[O], hc: HeaderCarrier): Future[O] = {
+  def POSTString[O](url: String, body: String, headers: Seq[(String,String)] = Seq.empty)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doPostString(url, body, headers)
       executeHooks(url, POST_VERB, Option(body), httpResponse)
@@ -50,7 +49,7 @@ trait HttpPost extends HttpVerb with ConnectionTracing with HttpHooks {
     }
   }
 
-  def POSTForm[O](url: String, body: Map[String, Seq[String]])(implicit rds: HttpReads[O], hc: HeaderCarrier): Future[O] = {
+  def POSTForm[O](url: String, body: Map[String, Seq[String]])(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doFormPost(url, body)
       executeHooks(url, POST_VERB, Option(body), httpResponse)
@@ -58,7 +57,7 @@ trait HttpPost extends HttpVerb with ConnectionTracing with HttpHooks {
     }
   }
 
-  def POSTEmpty[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier): Future[O] = {
+  def POSTEmpty[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doEmptyPost(url)
       executeHooks(url, POST_VERB, None, httpResponse)

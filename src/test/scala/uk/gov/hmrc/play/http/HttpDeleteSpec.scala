@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import play.twirl.api.Html
 import uk.gov.hmrc.play.http.hooks.HttpHook
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with CommonHttpBehaviour {
 
@@ -43,10 +44,7 @@ class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with C
       val testDelete = new StubbedHttpDelete(Future.successful(response))
       testDelete.DELETE(url).futureValue shouldBe response
     }
-    "be able to return HTML responses" in new HtmlHttpReads {
-      val testDelete = new StubbedHttpDelete(Future.successful(new DummyHttpResponse(testBody, 200)))
-      testDelete.DELETE(url).futureValue should be (an [Html])
-    }
+
     "be able to return objects deserialised from JSON" in {
       val testDelete = new StubbedHttpDelete(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
       testDelete.DELETE[TestClass](url).futureValue(PatienceConfig(Span(2, Seconds), Span(15, Millis))) should be (TestClass("t", 10))

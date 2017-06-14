@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,19 +55,6 @@ class HttpReadsSpec extends WordSpec with GeneratorDrivenPropertyChecks with Mat
     "pass through any failure" in {
       val reads = new OptionHttpReads with StubThatThrowsAnException
       an [Exception] should be thrownBy reads.readOptionOf.read(exampleVerb, exampleUrl, exampleResponse)
-    }
-  }
-  "HtmlHttpReads" should {
-    "convert a successful response body to HTML" in {
-      val reads = new HtmlHttpReads with StubThatReturnsTheResponse
-
-      reads.readToHtml.read(exampleVerb, exampleUrl, HttpResponse(0, responseString = Some("<p>hello</p>"))) should (
-        be (an[Html]) and have ('text ("<p>hello</p>"))
-      )
-    }
-    "pass through any failure" in {
-      val reads = new HtmlHttpReads with StubThatThrowsAnException
-      an [Exception] should be thrownBy reads.readToHtml.read(exampleVerb, exampleUrl, exampleResponse)
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 HM Revenue & Customs
+ * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package uk.gov.hmrc.play.http
 
-import play.api.http.HttpVerbs.{DELETE => DELETE_VERB, _}
+import uk.gov.hmrc.play.http.HttpVerbs.{DELETE => DELETE_VERB, _}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.logging.{MdcLoggingExecutionContext, ConnectionTracing}
-import scala.concurrent.Future
-import MdcLoggingExecutionContext._
+import uk.gov.hmrc.play.http.logging.{ConnectionTracing, MdcLoggingExecutionContext}
+
+import scala.concurrent.{ExecutionContext, Future}
+//import MdcLoggingExecutionContext._
 
 trait HttpDelete extends HttpVerb with ConnectionTracing with HttpHooks {
 
   protected def doDelete(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse]
 
-  def DELETE[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier): Future[O] = withTracing(DELETE_VERB, url) {
+  def DELETE[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = withTracing(DELETE_VERB, url) {
     val httpResponse = doDelete(url)
     executeHooks(url, DELETE_VERB, None, httpResponse)
     mapErrors(DELETE_VERB, url, httpResponse).map(rds.read(DELETE_VERB, url, _))
