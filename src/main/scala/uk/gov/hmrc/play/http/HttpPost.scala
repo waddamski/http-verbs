@@ -18,8 +18,8 @@ package uk.gov.hmrc.play.http
 
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.http.HttpVerbs.{POST => POST_VERB}
-import uk.gov.hmrc.play.http.hooks.{HttpHook, HttpHooks}
-import uk.gov.hmrc.play.http.logging.{ConnectionTracing, MdcLoggingExecutionContext}
+import uk.gov.hmrc.play.http.hooks.HttpHooks
+import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 

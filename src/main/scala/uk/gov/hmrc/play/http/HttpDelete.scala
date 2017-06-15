@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.play.http
 
-import uk.gov.hmrc.play.http.HttpVerbs.{DELETE => DELETE_VERB, _}
+import uk.gov.hmrc.play.http.HttpVerbs.{DELETE => DELETE_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.logging.{ConnectionTracing, MdcLoggingExecutionContext}
+import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
-//import MdcLoggingExecutionContext._
 
 trait HttpDelete extends HttpVerb with ConnectionTracing with HttpHooks {
 

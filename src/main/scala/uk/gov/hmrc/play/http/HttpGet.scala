@@ -20,7 +20,7 @@ import java.net.URLEncoder
 
 import uk.gov.hmrc.play.http.HttpVerbs.{GET => GET_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.logging.{ConnectionTracing, MdcLoggingExecutionContext}
+import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
