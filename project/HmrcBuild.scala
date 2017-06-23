@@ -33,7 +33,8 @@ object HmrcBuild extends Build {
       resolvers := Seq(
         Resolver.bintrayRepo("hmrc", "releases"),
         "typesafe-releases" at "http://repo.typesafe.com/typesafe/releases/"
-      )
+      ),
+      version := "38.00-SNAPSHOT"
     )
 }
 
@@ -42,7 +43,9 @@ private object AppDependencies {
   val compile = Seq(
     "com.typesafe.play" %% "play-json" % "2.5.15",
     "uk.gov.hmrc" %% "time" % "2.0.0",
-    "uk.gov.hmrc" %% "http-exceptions" % "1.0.0"
+    "uk.gov.hmrc" %% "http-exceptions" % "1.0.0",
+    "uk.gov.hmrc" %% "http-verbs-core" % "0.1-SNAPSHOT"
+
   )
 
 

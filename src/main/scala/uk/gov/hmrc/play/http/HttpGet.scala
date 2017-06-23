@@ -18,23 +18,22 @@ package uk.gov.hmrc.play.http
 
 import java.net.URLEncoder
 
+import uk.gov.hmrc.play.http.HttpTransport.CoreGet
 import uk.gov.hmrc.play.http.HttpVerbs.{GET => GET_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpGet extends HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpGet extends CoreGet with HttpVerb with ConnectionTracing with HttpHooks {
 
-  protected def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse]
-
-  def GET[A](url: String)(implicit rds: HttpReads[A], hc: HeaderCarrier, ec: ExecutionContext): Future[A] =withTracing(GET_VERB, url) {
+  def GET(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =withTracing(GET_VERB, url) {
     val httpResponse = doGet(url)
     executeHooks(url, GET_VERB, None, httpResponse)
-    mapErrors(GET_VERB, url, httpResponse).map(response => rds.read(GET_VERB, url, response))
+    mapErrors(GET_VERB, url, httpResponse)
   }
 
-  def GET[A](url: String, queryParams: Seq[(String, String)])(implicit rds: HttpReads[A], hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
+  def GET(url: String, queryParams: Seq[(String, String)])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val queryString = makeQueryString(queryParams)
     if (url.contains("?")) {
       throw new UrlValidationException(url, s"${this.getClass}.GET(url, queryParams)", "Query parameters must be provided as a Seq of tuples to this method")

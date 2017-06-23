@@ -17,20 +17,20 @@
 package uk.gov.hmrc.play.http
 
 import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.play.http.HttpTransport.CorePut
 import uk.gov.hmrc.play.http.HttpVerbs.{PUT => PUT_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpPut extends HttpVerb with ConnectionTracing with HttpHooks {
-  protected def doPut[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse]
+trait HttpPut extends CorePut with HttpVerb with ConnectionTracing with HttpHooks {
 
-  def PUT[I, O](url: String, body: I)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
+  def PUT[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(PUT_VERB, url) {
       val httpResponse = doPut(url, body)
       executeHooks(url, PUT_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
-      mapErrors(PUT_VERB, url, httpResponse).map(response => rds.read(PUT_VERB, url, response))
+      mapErrors(PUT_VERB, url, httpResponse)
     }
   }
 }

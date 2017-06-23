@@ -17,51 +17,44 @@
 package uk.gov.hmrc.play.http
 
 import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.play.http.HttpTransport.CorePost
 import uk.gov.hmrc.play.http.HttpVerbs.{POST => POST_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpPost extends HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpPost extends CorePost with HttpVerb with ConnectionTracing with HttpHooks {
 
-  protected def doPost[A](url: String, body: A, headers: Seq[(String,String)])(implicit wts: Writes[A], hc: HeaderCarrier): Future[HttpResponse]
-
-  protected def doPostString(url: String, body: String, headers: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[HttpResponse]
-  
-  protected def doEmptyPost[A](url: String)(implicit hc: HeaderCarrier): Future[HttpResponse]
-
-  protected def doFormPost(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier): Future[HttpResponse]
-
-  def POST[I, O](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
+  def POST[I](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doPost(url, body, headers)
       executeHooks(url, POST_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
-      mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
+      mapErrors(POST_VERB, url, httpResponse)
     }
   }
 
-  def POSTString[O](url: String, body: String, headers: Seq[(String,String)] = Seq.empty)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
+  def POSTString(url: String, body: String, headers: Seq[(String,String)] = Seq.empty)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doPostString(url, body, headers)
       executeHooks(url, POST_VERB, Option(body), httpResponse)
-      mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
+      mapErrors(POST_VERB, url, httpResponse)
     }
   }
 
-  def POSTForm[O](url: String, body: Map[String, Seq[String]])(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
+  def POSTForm(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doFormPost(url, body)
       executeHooks(url, POST_VERB, Option(body), httpResponse)
-      mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
+      mapErrors(POST_VERB, url, httpResponse)
     }
   }
 
-  def POSTEmpty[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = {
+  def POSTEmpty(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doEmptyPost(url)
       executeHooks(url, POST_VERB, None, httpResponse)
-      mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
+      mapErrors(POST_VERB, url, httpResponse)
     }
   }
 }
