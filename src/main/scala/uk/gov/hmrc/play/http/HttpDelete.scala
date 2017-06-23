@@ -16,14 +16,13 @@
 
 package uk.gov.hmrc.play.http
 
-import uk.gov.hmrc.play.http.HttpTransport.CoreDelete
 import uk.gov.hmrc.play.http.HttpVerbs.{DELETE => DELETE_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpDelete extends CoreDelete with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpDelete extends CoreDelete with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   def DELETE(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = withTracing(DELETE_VERB, url) {
     val httpResponse = doDelete(url)

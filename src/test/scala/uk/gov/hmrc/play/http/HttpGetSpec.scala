@@ -38,7 +38,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, WordSpecLike}
 import play.api.http.HttpVerbs._
 import play.twirl.api.Html
-import uk.gov.hmrc.play.http.hooks.HttpHook
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

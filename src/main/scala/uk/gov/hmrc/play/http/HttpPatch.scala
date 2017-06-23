@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.play.http
 
-import uk.gov.hmrc.play.http.HttpVerbs.{PATCH => PATCH_VERB}
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.play.http.HttpTransport.CorePatch
-import uk.gov.hmrc.play.http.hooks.{HttpHook, HttpHooks}
+import uk.gov.hmrc.play.http.HttpVerbs.{PATCH => PATCH_VERB}
+import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpPatch extends CorePatch with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpPatch extends CorePatch with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   def PATCH[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(PATCH_VERB, url) {

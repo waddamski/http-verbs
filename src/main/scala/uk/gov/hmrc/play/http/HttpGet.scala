@@ -18,14 +18,13 @@ package uk.gov.hmrc.play.http
 
 import java.net.URLEncoder
 
-import uk.gov.hmrc.play.http.HttpTransport.CoreGet
 import uk.gov.hmrc.play.http.HttpVerbs.{GET => GET_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpGet extends CoreGet with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpGet extends CoreGet with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   def GET(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =withTracing(GET_VERB, url) {
     val httpResponse = doGet(url)

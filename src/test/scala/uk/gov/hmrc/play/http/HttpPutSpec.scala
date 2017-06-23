@@ -22,7 +22,6 @@ import org.scalatest.{Matchers, WordSpecLike}
 import play.api.http.HttpVerbs._
 import play.api.libs.json.{Json, Writes}
 import play.twirl.api.Html
-import uk.gov.hmrc.play.http.hooks.HttpHook
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 

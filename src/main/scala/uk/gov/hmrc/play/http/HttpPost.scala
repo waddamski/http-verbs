@@ -17,14 +17,13 @@
 package uk.gov.hmrc.play.http
 
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.play.http.HttpTransport.CorePost
 import uk.gov.hmrc.play.http.HttpVerbs.{POST => POST_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpPost extends CorePost with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpPost extends CorePost with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   def POST[I](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {

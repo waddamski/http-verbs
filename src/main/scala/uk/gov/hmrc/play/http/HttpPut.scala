@@ -17,16 +17,16 @@
 package uk.gov.hmrc.play.http
 
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.play.http.HttpTransport.CorePut
 import uk.gov.hmrc.play.http.HttpVerbs.{PUT => PUT_VERB}
 import uk.gov.hmrc.play.http.hooks.HttpHooks
 import uk.gov.hmrc.play.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpPut extends CorePut with HttpVerb with ConnectionTracing with HttpHooks {
 
-  def PUT[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+trait HttpPut extends CorePut with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
+
+  def PUT[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec:ExecutionContext): Future[HttpResponse] = {
     withTracing(PUT_VERB, url) {
       val httpResponse = doPut(url, body)
       executeHooks(url, PUT_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
