@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpPut extends CorePut with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
-  def PUT[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec:ExecutionContext): Future[HttpResponse] = {
+  override def put[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec:ExecutionContext): Future[HttpResponse] = {
     withTracing(PUT_VERB, url) {
       val httpResponse = doPut(url, body)
       executeHooks(url, PUT_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)

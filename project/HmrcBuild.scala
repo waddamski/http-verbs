@@ -34,7 +34,7 @@ object HmrcBuild extends Build {
         Resolver.bintrayRepo("hmrc", "releases"),
         "typesafe-releases" at "http://repo.typesafe.com/typesafe/releases/"
       ),
-      version := "38.00-SNAPSHOT"
+      version := "38.0.0-SNAPSHOT"
     )
 }
 

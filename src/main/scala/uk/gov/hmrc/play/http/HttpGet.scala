@@ -26,18 +26,18 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpGet extends CoreGet with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
-  def GET(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =withTracing(GET_VERB, url) {
+  override def get(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =withTracing(GET_VERB, url) {
     val httpResponse = doGet(url)
     executeHooks(url, GET_VERB, None, httpResponse)
     mapErrors(GET_VERB, url, httpResponse)
   }
 
-  def GET(url: String, queryParams: Seq[(String, String)])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  override def get(url: String, queryParams: Seq[(String, String)])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val queryString = makeQueryString(queryParams)
     if (url.contains("?")) {
       throw new UrlValidationException(url, s"${this.getClass}.GET(url, queryParams)", "Query parameters must be provided as a Seq of tuples to this method")
     }
-    GET(url + queryString)
+    get(url + queryString)
   }
 
   private def makeQueryString(queryParams: Seq[(String,String)]) = {

@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpPost extends CorePost with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
-  def POST[I](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  override def post[I](url: String, body: I, headers: Seq[(String,String)] = Seq.empty)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doPost(url, body, headers)
       executeHooks(url, POST_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
@@ -33,7 +33,7 @@ trait HttpPost extends CorePost with HttpTransport with HttpVerb with Connection
     }
   }
 
-  def POSTString(url: String, body: String, headers: Seq[(String,String)] = Seq.empty)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  override def postString(url: String, body: String, headers: Seq[(String,String)] = Seq.empty)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doPostString(url, body, headers)
       executeHooks(url, POST_VERB, Option(body), httpResponse)
@@ -41,7 +41,7 @@ trait HttpPost extends CorePost with HttpTransport with HttpVerb with Connection
     }
   }
 
-  def POSTForm(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  override def postForm(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doFormPost(url, body)
       executeHooks(url, POST_VERB, Option(body), httpResponse)
@@ -49,7 +49,7 @@ trait HttpPost extends CorePost with HttpTransport with HttpVerb with Connection
     }
   }
 
-  def POSTEmpty(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  override def postEmpty(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(POST_VERB, url) {
       val httpResponse = doEmptyPost(url)
       executeHooks(url, POST_VERB, None, httpResponse)
