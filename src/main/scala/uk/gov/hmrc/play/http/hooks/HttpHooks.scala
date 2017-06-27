@@ -20,9 +20,6 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.Future
 
-trait HttpHook {
-  def apply(url: String, verb: String, body: Option[_], responseF: Future[HttpResponse])(implicit hc: HeaderCarrier)
-}
 
 trait HttpHooks {
   val hooks: Seq[HttpHook]
