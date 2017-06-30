@@ -21,7 +21,6 @@ import java.util.concurrent.TimeoutException
 
 import scala.concurrent.{ExecutionContext, Future}
 
-//!@
 trait HttpVerb  {
   @deprecated("ProcessingFunction is obsolete, use the relevant HttpReads[A] instead", "18/03/2015")
   type ProcessingFunction = (Future[HttpResponse], String) => Future[HttpResponse]

@@ -22,12 +22,11 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.http.HttpVerbs._
 import play.api.libs.json.Json
-import play.twirl.api.Html
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.test.TestHttpTransport
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with CommonHttpBehaviour with OptionValues {
 
