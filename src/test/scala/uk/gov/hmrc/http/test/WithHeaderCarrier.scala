@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http.test
+package uk.gov.hmrc.http.test
 
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait WithHeaderCarrier {
   implicit val hc = HeaderCarrier()

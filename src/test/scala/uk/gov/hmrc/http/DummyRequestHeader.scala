@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 import java.security.cert.X509Certificate
 

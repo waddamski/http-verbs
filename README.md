@@ -34,8 +34,8 @@ _All examples show below are available in [Examples.scala](src/test/scala/uk/gov
 Each verb is available as both an agnostic `Http___` trait and a play-specific `WS___` trait. They can be used as mixins:
 
 ```scala
-import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.http.ws._
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.ws._
 
 trait ConnectorWithMixins extends HttpGet with HttpPost {
   
@@ -49,8 +49,8 @@ object ConnectorWithMixins extends ConnectorWithMixins with WSGet with WSPost {
 or as `val`s:
 
 ```scala
-import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.http.ws._
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.ws._
 
 trait ConnectorWithHttpValues {
   val http: HttpGet with HttpPost

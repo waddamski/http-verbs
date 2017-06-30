@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 import java.net.URLEncoder
 
-import uk.gov.hmrc.play.http.HttpVerbs.{GET => GET_VERB}
-import uk.gov.hmrc.play.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.logging.ConnectionTracing
+import uk.gov.hmrc.http.HttpVerbs.{GET => GET_VERB}
+import uk.gov.hmrc.http.hooks.HttpHooks
+import uk.gov.hmrc.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 

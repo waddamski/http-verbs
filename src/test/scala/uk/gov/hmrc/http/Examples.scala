@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play
+package uk.gov.hmrc.http
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object Examples {
-
-  import uk.gov.hmrc.play.http._
-  import uk.gov.hmrc.play.http.ws._
 
 
   trait VerbExamples {

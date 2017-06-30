@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http.filter
+package uk.gov.hmrc.http.filter
 
 import org.slf4j.{Marker, Logger}
 

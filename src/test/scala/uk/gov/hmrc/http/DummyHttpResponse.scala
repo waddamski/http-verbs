@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 import play.api.libs.json.{JsValue, Json}
 

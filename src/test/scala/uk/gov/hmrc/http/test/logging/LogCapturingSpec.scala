@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http.test.logging
+package uk.gov.hmrc.http.test.logging
 
 import ch.qos.logback.classic.Level
 import org.scalatest.{LoneElement, Matchers, WordSpec}

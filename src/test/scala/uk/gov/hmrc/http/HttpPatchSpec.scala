@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -22,8 +22,8 @@ import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.http.HttpVerbs._
 import play.api.libs.json.{Json, Writes}
 import play.twirl.api.Html
-import uk.gov.hmrc.play.http.hooks.HttpHook
-import uk.gov.hmrc.play.test.TestHttpTransport
+import uk.gov.hmrc.http.hooks.HttpHook
+import uk.gov.hmrc.http.test.TestHttpTransport
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,7 +54,7 @@ class HttpPatchSpec extends WordSpecLike with Matchers with CommonHttpBehaviour 
     behave like aTracingHttpCall(PATCH, "PATCH", new StubbedHttpPatch(defaultHttpResponse)) { _.patch(url, testObject) }
 
     "Invoke any hooks provided" in {
-      import uk.gov.hmrc.play.test.Concurrent.await
+      import uk.gov.hmrc.http.test.Concurrent.await
 
       val dummyResponseFuture = Future.successful(new DummyHttpResponse(testBody, 200))
       val testPatch = new StubbedHttpPatch(dummyResponseFuture)

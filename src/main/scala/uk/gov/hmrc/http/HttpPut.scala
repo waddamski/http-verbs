@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.play.http.HttpVerbs.{PUT => PUT_VERB}
-import uk.gov.hmrc.play.http.hooks.HttpHooks
-import uk.gov.hmrc.play.http.logging.ConnectionTracing
+import uk.gov.hmrc.http.HttpVerbs.{PUT => PUT_VERB}
+import uk.gov.hmrc.http.hooks.HttpHooks
+import uk.gov.hmrc.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 

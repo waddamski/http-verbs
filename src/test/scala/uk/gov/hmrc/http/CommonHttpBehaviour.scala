@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
@@ -22,7 +22,8 @@ import java.util.concurrent.TimeoutException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpecLike}
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.http.logging.{ConnectionTracing, LoggingDetails}
+import uk.gov.hmrc.http.logging.{ConnectionTracing, LoggingDetails}
+import uk.gov.hmrc.play.http.{BadGatewayException, GatewayTimeoutException}
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http
+package uk.gov.hmrc.http
 
 class UrlValidationException(val url: String, val context: String, val message: String) extends Exception {
   override def getMessage: String = {
