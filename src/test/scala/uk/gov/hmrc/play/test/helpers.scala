@@ -16,6 +16,11 @@
 
 package uk.gov.hmrc.play.test
 
+import play.api.libs.json.Writes
+import uk.gov.hmrc.play.http._
+
+import scala.concurrent.{ExecutionContext, Future}
+
 object Concurrent {
   import scala.concurrent.{Await, Future}
   import scala.concurrent.duration._
@@ -27,3 +32,22 @@ object Concurrent {
 
   def await[A](future: Future[A]) = Await.result(future, defaultTimeout)
 }
+
+trait TestHttpTransport extends HttpTransport {
+  override def doPut[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier):Future[HttpResponse]= ???
+
+  override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = ???
+
+  override def doDelete(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = ???
+
+  override def doPatch[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = ???
+
+  override def doPost[A](url: String, body: A, headers: Seq[(String, String)])(implicit wts: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = ???
+
+  override def doPostString(url: String, body: String, headers: Seq[(String, String)])(implicit hc: HeaderCarrier): Future[HttpResponse] = ???
+
+  override def doEmptyPost[A](url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = ???
+
+  override def doFormPost(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier): Future[HttpResponse] = ???
+}
+

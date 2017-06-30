@@ -18,22 +18,24 @@ package uk.gov.hmrc.play.http
 
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.{Matchers, OptionValues, WordSpecLike}
 import play.api.http.HttpVerbs._
 import play.api.libs.json.{Json, Writes}
 import play.twirl.api.Html
+import uk.gov.hmrc.play.http.hooks.HttpHook
+import uk.gov.hmrc.play.test.TestHttpTransport
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class HttpPatchSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
+class HttpPatchSpec extends WordSpecLike with Matchers with CommonHttpBehaviour with OptionValues {
 
-  class StubbedHttpPatch(doPatchResult: Future[HttpResponse]) extends HttpPatch with ConnectionTracingCapturing with MockitoSugar {
+  class StubbedHttpPatch(doPatchResult: Future[HttpResponse]) extends HttpPatch with ConnectionTracingCapturing with MockitoSugar with TestHttpTransport {
     val testHook1 = mock[HttpHook]
     val testHook2 = mock[HttpHook]
     val hooks = Seq(testHook1, testHook2)
 
-    def doPatch[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier)= doPatchResult
+    override def doPatch[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier)= doPatchResult
   }
 
   "HttpPatch" should {
@@ -41,22 +43,22 @@ class HttpPatchSpec extends WordSpecLike with Matchers with CommonHttpBehaviour 
     "be able to return plain responses" in {
       val response = new DummyHttpResponse(testBody, 200)
       val testPatch = new StubbedHttpPatch(Future.successful(response))
-      testPatch.PATCH(url, testObject).futureValue shouldBe response
+      testPatch.patch(url, testObject).futureValue shouldBe response
     }
     "be able to return objects deserialised from JSON" in {
       val testPatch = new StubbedHttpPatch(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
-      testPatch.PATCH[TestRequestClass, TestClass](url, testObject).futureValue should be (TestClass("t", 10))
+      Json.parse(testPatch.patch[TestRequestClass](url, testObject).futureValue.body).asOpt[TestClass].value should be (TestClass("t", 10))
     }
 
-    behave like anErrorMappingHttpCall(PATCH, (url, responseF) => new StubbedHttpPatch(responseF).PATCH(url, testObject))
-    behave like aTracingHttpCall(PATCH, "PATCH", new StubbedHttpPatch(defaultHttpResponse)) { _.PATCH(url, testObject) }
+    behave like anErrorMappingHttpCall(PATCH, (url, responseF) => new StubbedHttpPatch(responseF).patch(url, testObject))
+    behave like aTracingHttpCall(PATCH, "PATCH", new StubbedHttpPatch(defaultHttpResponse)) { _.patch(url, testObject) }
 
     "Invoke any hooks provided" in {
       import uk.gov.hmrc.play.test.Concurrent.await
 
       val dummyResponseFuture = Future.successful(new DummyHttpResponse(testBody, 200))
       val testPatch = new StubbedHttpPatch(dummyResponseFuture)
-      await(testPatch.PATCH(url, testObject))
+      await(testPatch.patch(url, testObject))
 
       val testJson = Json.stringify(trcreads.writes(testObject))
 

@@ -29,14 +29,14 @@ object Examples {
 
     implicit val hc = HeaderCarrier()
 
-    http.GET("http://gov.uk/hmrc")
-    http.DELETE("http://gov.uk/hmrc")
-    http.POST("http://gov.uk/hmrc", body = "hi there")
-    http.PUT("http://gov.uk/hmrc", body = "hi there")
-    http.PATCH("http://gov.uk/hmrc", body = "hi there")
+    http.get("http://gov.uk/hmrc")
+    http.delete("http://gov.uk/hmrc")
+    http.post("http://gov.uk/hmrc", body = "hi there")
+    http.put("http://gov.uk/hmrc", body = "hi there")
+    http.patch("http://gov.uk/hmrc", body = "hi there")
 
-    val r1 = http.GET("http://gov.uk/hmrc") // Returns an HttpResponse
-    val r2 = http.GET[HttpResponse]("http://gov.uk/hmrc") // Can specify this explicitly
+    val r1 = http.get("http://gov.uk/hmrc") // Returns an HttpResponse
+
     r1.map { r =>
       r.status
       r.body
