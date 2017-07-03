@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpPatch extends CorePatch with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpPatch extends CorePatch with PatchHttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   def patch[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     withTracing(PATCH_VERB, url) {

@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.logging.ConnectionTracing
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait HttpGet extends CoreGet with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpGet extends CoreGet with GetHttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   override def get(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =withTracing(GET_VERB, url) {
     val httpResponse = doGet(url)

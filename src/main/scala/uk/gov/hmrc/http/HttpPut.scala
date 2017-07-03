@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.logging.ConnectionTracing
 import scala.concurrent.{ExecutionContext, Future}
 
 
-trait HttpPut extends CorePut with HttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
+trait HttpPut extends CorePut with PutHttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   override def put[I](url: String, body: I)(implicit wts: Writes[I], hc: HeaderCarrier, ec:ExecutionContext): Future[HttpResponse] = {
     withTracing(PUT_VERB, url) {
