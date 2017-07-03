@@ -1,19 +1,16 @@
 http-verbs
 ==========
 
-[![Join the chat at https://gitter.im/hmrc/http-verbs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hmrc/http-verbs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![Build Status](https://travis-ci.org/hmrc/http-verbs.svg)](https://travis-ci.org/hmrc/http-verbs) [ ![Download](https://api.bintray.com/packages/hmrc/releases/http-verbs/images/download.svg) ](https://bintray.com/hmrc/releases/http-verbs/_latestVersion)
+[![Build Status](https://travis-ci.org/hmrc/http-verbs.svg)](https://travis-ci.org/hmrc/http-verbs) [ ![Download](https://api.bintray.com/packages/hmrc/releases/http-verbs/images/download.svg) ](https://bintray.com/hmrc/releases/http-verbs/_latestVersion)
 
-http-verbs is a Scala library providing an interface to make asynchronous HTTP calls.  The underlying implementation uses [Play WS](https://www.playframework.com/documentation/latest/ScalaWS).
+http-verbs is a Scala library providing an interface to make asynchronous HTTP calls. 
 
-It encapsulates some common concerns for calling other HTTP services on the HMRC Tax Platform, including:
+This library implements parts of [hmrc/http-core](https://github.com/hmrc/http-core) that are concerned with business logic side of calling other HTTP services on the HMRC Tax Platform, including:
 
-* ~~Auditing~~
-* Logging
-* Propagation of common headers
-* Response handling, converting failure status codes into a consistent set of exceptions - allows failures to be automatically propagated to the caller
-* Request & Response de-serialization
-
-**Auditing is no longer part of http-verbs, please see docs for [play-auditing](http://github.com/hmrc/play-auditing) for further info.**
+  * executing hooks
+  * mapping errors
+  * connection tracing
+  
 
 ## Adding to your build
 
