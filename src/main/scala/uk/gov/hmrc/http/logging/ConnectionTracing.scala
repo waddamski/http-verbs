@@ -17,6 +17,7 @@
 package uk.gov.hmrc.http.logging
 
 import org.slf4j.LoggerFactory
+import uk.gov.hmrc.http.LoggingDetails
 import uk.gov.hmrc.play.http.{HttpException, Upstream4xxResponse}
 
 import scala.concurrent._
