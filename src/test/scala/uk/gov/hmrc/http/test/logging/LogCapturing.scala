@@ -19,8 +19,7 @@ package uk.gov.hmrc.http.test.logging
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Level, Logger => LogbackLogger}
 import ch.qos.logback.core.read.ListAppender
-import org.slf4j.LoggerFactory
-import play.api.LoggerLike
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 import scala.reflect._
@@ -42,5 +41,5 @@ trait LogCapturing {
     body(appender.list.asScala.toList)
   }
 
-  def withCaptureOfLoggingFrom(logger: LoggerLike)(body: (=> List[ILoggingEvent]) => Any): Any = withCaptureOfLoggingFrom(logger.logger.asInstanceOf[LogbackLogger])(body)
+  def withCaptureOfLoggingFrom(logger: Logger)(body: (=> List[ILoggingEvent]) => Any): Any = withCaptureOfLoggingFrom(logger.asInstanceOf[LogbackLogger])(body)
 }

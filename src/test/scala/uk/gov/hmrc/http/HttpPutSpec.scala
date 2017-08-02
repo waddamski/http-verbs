@@ -19,7 +19,6 @@ package uk.gov.hmrc.http
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, WordSpecLike}
-import play.api.http.HttpVerbs._
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.hooks.HttpHook
 
@@ -43,17 +42,13 @@ class HttpPutSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
       val testPut = new StubbedHttpPut(Future.successful(response))
       testPut.PUT(url, testObject).futureValue shouldBe response
     }
-//    "be able to return HTML responses" in new HtmlHttpReads {
-//      val testPut = new StubbedHttpPut(Future.successful(new DummyHttpResponse(testBody, 200)))
-//      testPut.PUT(url, testObject).futureValue should be (an [Html])
-//    }
     "be able to return objects deserialised from JSON" in {
       val testPut = new StubbedHttpPut(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
       testPut.PUT[TestRequestClass, TestClass](url, testObject).futureValue should be (TestClass("t", 10))
     }
 
-    behave like anErrorMappingHttpCall(PUT, (url, responseF) => new StubbedHttpPut(responseF).PUT(url, testObject))
-    behave like aTracingHttpCall(PUT, "PUT", new StubbedHttpPut(defaultHttpResponse)) { _.PUT(url, testObject) }
+    behave like anErrorMappingHttpCall("PUT", (url, responseF) => new StubbedHttpPut(responseF).PUT(url, testObject))
+    behave like aTracingHttpCall("PUT", "PUT", new StubbedHttpPut(defaultHttpResponse)) { _.PUT(url, testObject) }
 
     "Invoke any hooks provided" in {
 

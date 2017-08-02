@@ -19,11 +19,10 @@ package uk.gov.hmrc.http
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, WordSpecLike}
-import play.api.http.HttpVerbs._
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.hooks.HttpHook
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class HttpPatchSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
@@ -43,17 +42,13 @@ class HttpPatchSpec extends WordSpecLike with Matchers with CommonHttpBehaviour 
       val testPatch = new StubbedHttpPatch(Future.successful(response))
       testPatch.PATCH(url, testObject).futureValue shouldBe response
     }
-//    "be able to return HTML responses" in new HtmlHttpReads {
-//      val testPatch = new StubbedHttpPatch(Future.successful(new DummyHttpResponse(testBody, 200)))
-//      testPatch.PATCH(url, testObject).futureValue should be (an [Html])
-//    }
     "be able to return objects deserialised from JSON" in {
       val testPatch = new StubbedHttpPatch(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
       testPatch.PATCH[TestRequestClass, TestClass](url, testObject).futureValue should be (TestClass("t", 10))
     }
 
-    behave like anErrorMappingHttpCall(PATCH, (url, responseF) => new StubbedHttpPatch(responseF).PATCH(url, testObject))
-    behave like aTracingHttpCall(PATCH, "PATCH", new StubbedHttpPatch(defaultHttpResponse)) { _.PATCH(url, testObject) }
+    behave like anErrorMappingHttpCall("PATCH", (url, responseF) => new StubbedHttpPatch(responseF).PATCH(url, testObject))
+    behave like aTracingHttpCall("PATCH", "PATCH", new StubbedHttpPatch(defaultHttpResponse)) { _.PATCH(url, testObject) }
 
     "Invoke any hooks provided" in {
 

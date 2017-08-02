@@ -20,10 +20,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Matchers, WordSpecLike}
-import play.api.http.HttpVerbs._
 import uk.gov.hmrc.http.hooks.HttpHook
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with CommonHttpBehaviour {
@@ -43,16 +42,12 @@ class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with C
       val testDelete = new StubbedHttpDelete(Future.successful(response))
       testDelete.DELETE(url).futureValue shouldBe response
     }
-//    "be able to return HTML responses" in new HtmlHttpReads {
-//      val testDelete = new StubbedHttpDelete(Future.successful(new DummyHttpResponse(testBody, 200)))
-//      testDelete.DELETE(url).futureValue should be (an [Html])
-//    }
     "be able to return objects deserialised from JSON" in {
       val testDelete = new StubbedHttpDelete(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
       testDelete.DELETE[TestClass](url).futureValue(PatienceConfig(Span(2, Seconds), Span(15, Millis))) should be (TestClass("t", 10))
     }
-    behave like anErrorMappingHttpCall(DELETE, (url, responseF) => new StubbedHttpDelete(responseF).DELETE(url))
-    behave like aTracingHttpCall(DELETE, "DELETE", new StubbedHttpDelete(defaultHttpResponse)) { _.DELETE(url) }
+    behave like anErrorMappingHttpCall("DELETE", (url, responseF) => new StubbedHttpDelete(responseF).DELETE(url))
+    behave like aTracingHttpCall("DELETE", "DELETE", new StubbedHttpDelete(defaultHttpResponse)) { _.DELETE(url) }
 
     "Invoke any hooks provided" in {
 
