@@ -19,47 +19,46 @@ package uk.gov.hmrc.http
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.{Matchers, WordSpecLike}
 import play.api.http.HttpVerbs._
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.hooks.HttpHook
-import uk.gov.hmrc.http.test.TestHttpTransport
-
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
-class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with CommonHttpBehaviour with OptionValues {
+class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with CommonHttpBehaviour {
 
-  class StubbedHttpDelete(response: Future[HttpResponse]) extends HttpDelete with ConnectionTracingCapturing with TestHttpTransport {
+  class StubbedHttpDelete(response: Future[HttpResponse]) extends HttpDelete with ConnectionTracingCapturing {
     val testHook1 = mock[HttpHook]
     val testHook2 = mock[HttpHook]
     val hooks = Seq(testHook1, testHook2)
 
     def appName: String = ???
-    override def doDelete(url: String)(implicit hc: HeaderCarrier) = response
+    def doDelete(url: String)(implicit hc: HeaderCarrier) = response
   }
 
   "HttpDelete" should {
     "be able to return plain responses" in {
       val response = new DummyHttpResponse(testBody, 200)
       val testDelete = new StubbedHttpDelete(Future.successful(response))
-      testDelete.delete(url).futureValue shouldBe response
+      testDelete.DELETE(url).futureValue shouldBe response
     }
-
+//    "be able to return HTML responses" in new HtmlHttpReads {
+//      val testDelete = new StubbedHttpDelete(Future.successful(new DummyHttpResponse(testBody, 200)))
+//      testDelete.DELETE(url).futureValue should be (an [Html])
+//    }
     "be able to return objects deserialised from JSON" in {
       val testDelete = new StubbedHttpDelete(Future.successful(new DummyHttpResponse("""{"foo":"t","bar":10}""", 200)))
-      Json.parse(testDelete.delete(url).futureValue(PatienceConfig(Span(2, Seconds), Span(15, Millis))).body).asOpt[TestClass].value should be (TestClass("t", 10))
+      testDelete.DELETE[TestClass](url).futureValue(PatienceConfig(Span(2, Seconds), Span(15, Millis))) should be (TestClass("t", 10))
     }
-
-    behave like anErrorMappingHttpCall(DELETE, (url, responseF) => new StubbedHttpDelete(responseF).delete(url))
-    behave like aTracingHttpCall(DELETE, "DELETE", new StubbedHttpDelete(defaultHttpResponse)) { _.delete(url) }
+    behave like anErrorMappingHttpCall(DELETE, (url, responseF) => new StubbedHttpDelete(responseF).DELETE(url))
+    behave like aTracingHttpCall(DELETE, "DELETE", new StubbedHttpDelete(defaultHttpResponse)) { _.DELETE(url) }
 
     "Invoke any hooks provided" in {
-      import uk.gov.hmrc.http.test.Concurrent.await
 
       val dummyResponseFuture = Future.successful(new DummyHttpResponse(testBody, 200))
       val testGet = new StubbedHttpDelete(dummyResponseFuture)
-      await(testGet.delete(url))
+      testGet.DELETE(url).futureValue
 
       verify(testGet.testHook1)(url, "DELETE", None, dummyResponseFuture)
       verify(testGet.testHook2)(url, "DELETE", None, dummyResponseFuture)

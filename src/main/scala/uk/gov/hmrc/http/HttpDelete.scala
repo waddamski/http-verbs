@@ -24,9 +24,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpDelete extends CoreDelete with DeleteHttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
-  override def delete(url: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = withTracing(DELETE_VERB, url) {
+  override def DELETE[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = withTracing(DELETE_VERB, url) {
     val httpResponse = doDelete(url)
     executeHooks(url, DELETE_VERB, None, httpResponse)
-    mapErrors(DELETE_VERB, url, httpResponse)
+    mapErrors(DELETE_VERB, url, httpResponse).map(rds.read(DELETE_VERB, url, _))
   }
 }

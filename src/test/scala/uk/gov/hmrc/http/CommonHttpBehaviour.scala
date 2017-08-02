@@ -23,7 +23,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpecLike}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.logging.ConnectionTracing
-import uk.gov.hmrc.play.http.{BadGatewayException, GatewayTimeoutException}
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +40,7 @@ trait CommonHttpBehaviour extends ScalaFutures with Matchers with WordSpecLike {
   val testRequestBody = "testRequestBody"
   val url = "http://some.url"
 
-  def response(returnValue: Option[String] = None, statusCode: Int = 200) = Future.successful(HttpResponse(statusCode, returnValue.map(Json.parse)))
+  def response(returnValue: Option[String] = None, statusCode: Int = 200) = Future.successful(HttpResponse(statusCode, returnValue.map(Json.parse(_))))
 
   val defaultHttpResponse = response()
 

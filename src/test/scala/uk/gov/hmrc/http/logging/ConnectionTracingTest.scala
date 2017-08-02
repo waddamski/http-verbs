@@ -21,7 +21,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpecLike}
 import org.slf4j.Logger
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.http._
 
 import scala.util.{Failure, Success}
 

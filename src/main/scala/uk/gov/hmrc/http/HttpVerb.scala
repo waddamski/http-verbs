@@ -19,8 +19,6 @@ package uk.gov.hmrc.http
 import java.net.ConnectException
 import java.util.concurrent.TimeoutException
 
-import uk.gov.hmrc.play.http.{BadGatewayException, GatewayTimeoutException}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpVerb  {
