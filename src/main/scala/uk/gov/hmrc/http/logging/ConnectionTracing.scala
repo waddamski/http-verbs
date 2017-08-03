@@ -17,7 +17,7 @@
 package uk.gov.hmrc.http.logging
 
 import org.slf4j.LoggerFactory
-import uk.gov.hmrc.http.{HttpException, LoggingDetails, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HttpException, Upstream4xxResponse}
 
 import scala.concurrent._
 import scala.util.{Failure, Success, Try}

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeoutException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpecLike}
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.logging.ConnectionTracing
+import uk.gov.hmrc.http.logging.{ConnectionTracing, LoggingDetails}
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
