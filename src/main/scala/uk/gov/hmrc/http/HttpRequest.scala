@@ -27,7 +27,7 @@ trait HttpRequest extends Request {
     case Some(config) if config.hasPathOrNull("internalServiceHostPatterns") =>
       config.getStringList("internalServiceHostPatterns").asScala.map(_.r).toSeq
     case _ =>
-      Seq("^.*\\.service$".r)
+      Seq("^.*\\.service$".r, "^.*\\.mdtp$".r)
   }
 
   lazy val userAgentHeader: Seq[(String, String)] = configuration match {

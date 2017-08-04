@@ -77,17 +77,19 @@ class HttpRequestSpec extends WordSpecLike with Matchers with MockitoSugar with 
     }
 
     "include 'remaining headers' in request for internal service call to .service URL" in {
-      val url = "http://test.service/bar" // an internal service call, according to config
       implicit val hc = HeaderCarrier(
         otherHeaders = Seq("foo" -> "secret!")
       )
-
       val httpRequest = new HttpRequest {
         override def configuration: Option[Config] = None
       }
-      val result = httpRequest.applicableHeaders(url)
-      result.contains("foo" -> "secret!") shouldBe true
 
+      for {url <- List("http://test.public.service/bar", "http://test.public.mdtp/bar"  )} {
+
+        val result = httpRequest.applicableHeaders(url)
+        assert(result.contains("foo" -> "secret!"), s"'other/remaining headers' for $url were not present")
+
+      }
     }
 
     "include 'remaining headers' in request for internal service call to other configured internal URL pattern" in {
