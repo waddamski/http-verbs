@@ -43,7 +43,7 @@ private object AppDependencies {
   val compile = Seq(
     "com.typesafe.play" %% "play-json" % "2.5.15",
     "uk.gov.hmrc" %% "time" % "2.0.0",
-    "uk.gov.hmrc" %% "http-core" % "100.0-SNAPSHOT"
+    "uk.gov.hmrc" %% "http-core" % "0.5.0"
   )
 
 
