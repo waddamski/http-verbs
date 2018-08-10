@@ -21,7 +21,8 @@ import java.util.concurrent.TimeoutException
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpecLike}
-import play.api.libs.json.Json
+import play.api.libs.json
+import play.api.libs.json._
 import uk.gov.hmrc.http.logging.{ConnectionTracing, LoggingDetails}
 
 import scala.collection.mutable
@@ -41,7 +42,7 @@ trait CommonHttpBehaviour extends ScalaFutures with Matchers with WordSpecLike {
   val url             = "http://some.url"
 
   def response(returnValue: Option[String] = None, statusCode: Int = 200) =
-    Future.successful(HttpResponse(statusCode, returnValue.map(Json.parse(_))))
+    Future.successful(HttpResponse(statusCode, responseString = returnValue))
 
   val defaultHttpResponse = response()
 
@@ -80,6 +81,33 @@ trait CommonHttpBehaviour extends ScalaFutures with Matchers with WordSpecLike {
       http.traceCalls.head._1 shouldBe verb
     }
 
+}
+
+object JsonHttpReads extends HttpErrorFunctions {
+  implicit def writeJson[I](implicit wts: json.Writes[I]) = new HttpWrites[I] {
+    override def write(body: I): String = Json.stringify(wts.writes(body))
+  }
+
+  implicit def readFromJson[O](implicit rds: json.Reads[O], mf: Manifest[O]): HttpReads[O] = new HttpReads[O] {
+    def read(method: String, url: String, response: HttpResponse) =
+      readJson(method, url, Json.parse(handleResponse(method, url)(response).body))
+  }
+
+  def readSeqFromJsonProperty[O](name: String)(implicit rds: json.Reads[O], mf: Manifest[O]) = new HttpReads[Seq[O]] {
+    def read(method: String, url: String, response: HttpResponse) = response.status match {
+      case 204 | 404 => Seq.empty
+      case _ =>
+        readJson[Seq[O]](method, url, (Json.parse(handleResponse(method, url)(response).body) \ name).getOrElse(JsNull)) //Added JsNull here to force validate to fail - replicates existing behaviour
+    }
+  }
+
+  private def readJson[A](method: String, url: String, jsValue: JsValue)(implicit rds: json.Reads[A], mf: Manifest[A]) =
+    jsValue
+      .validate[A]
+      .fold(
+        errs => throw new JsValidationException(method, url, mf.runtimeClass, errs.toString()),
+        valid => valid
+      )
 }
 
 trait ConnectionTracingCapturing extends ConnectionTracing {

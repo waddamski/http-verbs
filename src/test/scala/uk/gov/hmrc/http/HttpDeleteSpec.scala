@@ -23,9 +23,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.{Matchers, WordSpecLike}
 import uk.gov.hmrc.http.hooks.HttpHook
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import JsonHttpReads._
 
 class HttpDeleteSpec extends WordSpecLike with Matchers with MockitoSugar with CommonHttpBehaviour {
 

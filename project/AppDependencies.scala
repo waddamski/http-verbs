@@ -19,13 +19,13 @@ import sbt._
 object AppDependencies {
 
   val compile = Seq(
-    "com.typesafe.play" %% "play-json" % "2.6.9",
-    "uk.gov.hmrc"       %% "http-core" % "1.2.0",
+    "uk.gov.hmrc"       %% "http-core" % "1.3.0-SNAPSHOT",
     "com.typesafe"      % "config"     % "1.3.2",
     "org.slf4j"         % "slf4j-api"  % "1.7.25"
   )
 
   val test = Seq(
+    "com.typesafe.play" %% "play-json" % "2.6.9" % Test,
     "commons-codec"          % "commons-codec"   % "1.7"     % Test,
     "org.scalatest"          %% "scalatest"      % "3.0.3"   % Test,
     "org.scalacheck"         %% "scalacheck"     % "1.13.4"  % Test,

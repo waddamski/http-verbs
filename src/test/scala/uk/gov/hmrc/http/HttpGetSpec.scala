@@ -42,8 +42,10 @@ import uk.gov.hmrc.http.hooks.HttpHook
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import JsonHttpReads._
+
 class HttpGetSpec
-    extends WordSpecLike
+  extends WordSpecLike
     with Matchers
     with ScalaFutures
     with CommonHttpBehaviour
@@ -51,11 +53,11 @@ class HttpGetSpec
     with MockitoSugar {
 
   class StubbedHttpGet(doGetResult: Future[HttpResponse] = defaultHttpResponse)
-      extends HttpGet
+    extends HttpGet
       with ConnectionTracingCapturing {
     val testHook1 = mock[HttpHook]
     val testHook2 = mock[HttpHook]
-    val hooks     = Seq(testHook1, testHook2)
+    val hooks = Seq(testHook1, testHook2)
 
     override def configuration: Option[Config] = None
 
@@ -63,10 +65,11 @@ class HttpGetSpec
   }
 
   class UrlTestingHttpGet() extends HttpGet {
-    val testHook1                              = mock[HttpHook]
-    val testHook2                              = mock[HttpHook]
-    val hooks                                  = Seq(testHook1, testHook2)
-    var lastUrl: Option[String]                = None
+    val testHook1 = mock[HttpHook]
+    val testHook2 = mock[HttpHook]
+    val hooks = Seq(testHook1, testHook2)
+    var lastUrl: Option[String] = None
+
     override def configuration: Option[Config] = None
 
     override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
@@ -78,7 +81,7 @@ class HttpGetSpec
   "HttpGet" should {
     "be able to return plain responses" in {
       val response = new DummyHttpResponse(testBody, 200)
-      val testGet  = new StubbedHttpGet(Future.successful(response))
+      val testGet = new StubbedHttpGet(Future.successful(response))
       testGet.GET(url).futureValue shouldBe response
     }
     "be able to return objects deserialised from JSON" in {
@@ -86,12 +89,14 @@ class HttpGetSpec
       testGet.GET[TestClass](url).futureValue should be(TestClass("t", 10))
     }
     behave like anErrorMappingHttpCall("GET", (url, responseF) => new StubbedHttpGet(responseF).GET(url))
-    behave like aTracingHttpCall("GET", "GET", new StubbedHttpGet(defaultHttpResponse)) { _.GET(url) }
+    behave like aTracingHttpCall("GET", "GET", new StubbedHttpGet(defaultHttpResponse)) {
+      _.GET(url)
+    }
 
     "Invoke any hooks provided" in {
 
       val dummyResponseFuture = Future.successful(new DummyHttpResponse(testBody, 200))
-      val testGet             = new StubbedHttpGet(dummyResponseFuture)
+      val testGet = new StubbedHttpGet(dummyResponseFuture)
       testGet.GET(url).futureValue
 
       verify(testGet.testHook1)(url, "GET", None, dummyResponseFuture)
@@ -102,21 +107,21 @@ class HttpGetSpec
   "HttpGet with params Seq" should {
     "return an empty string if the query parameters is empty" in {
       val expected = Some("http://test.net")
-      val testGet  = new UrlTestingHttpGet()
+      val testGet = new UrlTestingHttpGet()
       testGet.GET("http://test.net", Seq())
       testGet.lastUrl shouldBe expected
     }
 
     "return a url with a single param pair" in {
       val expected = Some("http://test.net?one=1")
-      val testGet  = new UrlTestingHttpGet()
+      val testGet = new UrlTestingHttpGet()
       testGet.GET("http://test.net", Seq(("one", "1")))
       testGet.lastUrl shouldBe expected
     }
 
     "return a url with a multiple param pairs" in {
       val expected = Some("http://test.net?one=1&two=2&three=3")
-      val testGet  = new UrlTestingHttpGet()
+      val testGet = new UrlTestingHttpGet()
       testGet.GET("http://test.net", Seq(("one", "1"), ("two", "2"), ("three", "3")))
       testGet.lastUrl shouldBe expected
     }
@@ -132,7 +137,7 @@ class HttpGetSpec
 
     "return a url with duplicate param pairs" in {
       val expected = Some("http://test.net?one=1&two=2&one=11")
-      val testGet  = new UrlTestingHttpGet()
+      val testGet = new UrlTestingHttpGet()
       testGet.GET("http://test.net", Seq(("one", "1"), ("two", "2"), ("one", "11")))
       testGet.lastUrl shouldBe expected
     }

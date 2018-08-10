@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.http
 
-import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HttpVerbs.{PUT => PUT_VERB}
 import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.http.logging.ConnectionTracing
@@ -27,10 +26,10 @@ trait HttpPut extends CorePut with PutHttpTransport with HttpVerb with Connectio
 
   override def PUT[I, O](
     url: String,
-    body: I)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] =
+    body: I)(implicit wts: HttpWrites[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] =
     withTracing(PUT_VERB, url) {
       val httpResponse = doPut(url, body)
-      executeHooks(url, PUT_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
+      executeHooks(url, PUT_VERB, Option(wts.write(body)), httpResponse)
       mapErrors(PUT_VERB, url, httpResponse).map(response => rds.read(PUT_VERB, url, response))
     }
 

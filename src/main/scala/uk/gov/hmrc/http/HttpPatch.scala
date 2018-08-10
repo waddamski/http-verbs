@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.http
 
-import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HttpVerbs.{PATCH => PATCH_VERB}
 import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.http.logging.ConnectionTracing
@@ -27,10 +26,10 @@ trait HttpPatch extends CorePatch with PatchHttpTransport with HttpVerb with Con
 
   override def PATCH[I, O](
     url: String,
-    body: I)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] =
+    body: I)(implicit wts: HttpWrites[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] =
     withTracing(PATCH_VERB, url) {
       val httpResponse = doPatch(url, body)
-      executeHooks(url, PATCH_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
+      executeHooks(url, PATCH_VERB, Option(wts.write(body)), httpResponse)
       mapErrors(PATCH_VERB, url, httpResponse).map(response => rds.read(PATCH_VERB, url, response))
     }
 }

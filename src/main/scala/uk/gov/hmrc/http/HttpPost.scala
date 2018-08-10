@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.http
 
-import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.HttpVerbs.{POST => POST_VERB}
 import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.http.logging.ConnectionTracing
@@ -26,13 +25,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait HttpPost extends CorePost with PostHttpTransport with HttpVerb with ConnectionTracing with HttpHooks {
 
   override def POST[I, O](url: String, body: I, headers: Seq[(String, String)])(
-    implicit wts: Writes[I],
+    implicit wts: HttpWrites[I],
     rds: HttpReads[O],
     hc: HeaderCarrier,
     ec: ExecutionContext): Future[O] =
     withTracing(POST_VERB, url) {
       val httpResponse = doPost(url, body, headers)
-      executeHooks(url, POST_VERB, Option(Json.stringify(wts.writes(body))), httpResponse)
+      executeHooks(url, POST_VERB, Option(wts.write(body)), httpResponse)
       mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
     }
 

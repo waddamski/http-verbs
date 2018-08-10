@@ -26,6 +26,8 @@ import uk.gov.hmrc.http.hooks.HttpHook
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import JsonHttpReads._
+
 class HttpPostSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
 
   class StubbedHttpPost(doPostResult: Future[HttpResponse])
@@ -37,7 +39,7 @@ class HttpPostSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
     val hooks                                  = Seq(testHook1, testHook2)
     override def configuration: Option[Config] = None
 
-    def doPost[A](url: String, body: A, headers: Seq[(String, String)])(implicit rds: Writes[A], hc: HeaderCarrier) =
+    def doPost[A](url: String, body: A, headers: Seq[(String, String)])(implicit wts: HttpWrites[A], hc: HeaderCarrier) =
       doPostResult
     def doFormPost(url: String, body: Map[String, Seq[String]])(implicit hc: HeaderCarrier) = doPostResult
     def doPostString(url: String, body: String, headers: Seq[(String, String)])(implicit hc: HeaderCarrier) =

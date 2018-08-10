@@ -26,6 +26,8 @@ import uk.gov.hmrc.http.hooks.HttpHook
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import JsonHttpReads._
+
 class HttpPutSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
 
   class StubbedHttpPut(doPutResult: Future[HttpResponse])
@@ -37,7 +39,7 @@ class HttpPutSpec extends WordSpecLike with Matchers with CommonHttpBehaviour {
     val hooks                                  = Seq(testHook1, testHook2)
     override def configuration: Option[Config] = None
 
-    def doPut[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier) = doPutResult
+    def doPut[A](url: String, body: A)(implicit wts: HttpWrites[A], hc: HeaderCarrier) = doPutResult
   }
 
   "HttpPut" should {
