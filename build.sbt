@@ -10,6 +10,22 @@ val scala2_12 = "2.12.8"
 // TODO: restrict parallelExecution to tests only (the obvious way to do this using Test scope does not seem to work correctly)
 parallelExecution in Global := false
 
+// IntelliJ has trouble importing this project for two reasons
+// 1. The common module requires a dependency on a play version
+// 2. The play version specific modules require sources from common
+// The sbt configuration treats the whole http-verbs-common module as just some additional unmanaged source files, and is happy
+// To allow code-completion, navigation etc inside IntelliJ we have to pick a specific play version to resolve the common
+// module with. Setting this env var achieves that
+// Just set -DintelliJCompat=true as a VM arg in the sbt preferences
+// TODO: Better way to achieve this
+val intelliJCompat = System.getProperty("intelliJCompat", "false").toBoolean
+
+lazy val intelliJSettings: Seq[Setting[_]] = commonSettings ++ Seq(
+  libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay26,
+  // Not using the defined project lazy val to avoid cyclic dependency leading to stack overflow
+  unmanagedClasspath in Compile += file(httpVerbsPlay26.base.getAbsolutePath + "/target/scala-2.11/classes")
+)
+
 lazy val commonSettings = Seq(
   organization := "uk.gov.hmrc",
   majorVersion := 10,
@@ -38,12 +54,10 @@ lazy val library = (project in file("."))
 lazy val httpVerbsCommon = Project("http-verbs-common", file("http-verbs-common"))
   .disablePlugins(SbtGitVersioning)
   .settings(
-    commonSettings,
-    libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay26,
-    unmanagedClasspath in Compile += file(httpVerbsPlay26.base.getAbsolutePath + "/target/scala-2.11/classes")
+    if(intelliJCompat) intelliJSettings else Seq.empty
   )
 
-lazy val httpVerbsPlay25: Project = Project("http-verbs-play-25", file("http-verbs-play-25"))
+lazy val httpVerbsPlay25 = Project("http-verbs-play-25", file("http-verbs-play-25"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
@@ -51,11 +65,14 @@ lazy val httpVerbsPlay25: Project = Project("http-verbs-play-25", file("http-ver
     unmanagedSourceDirectories in Test += (httpVerbsCommon / Test / scalaSource).value,
     crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay25 ++ AppDependencies.testCommon ++ AppDependencies.testPlay25,
-    unmanagedClasspath in Compile += file(httpVerbsCommon.base.getAbsolutePath + "/target/scala-2.11/classes"),
+    unmanagedClasspath in Compile ++= {
+      val cp = (httpVerbsCommon / Compile / unmanagedClasspath).value.map(_.data)
+      if(intelliJCompat) cp else Seq.empty
+    },
     Test / fork := true // akka is not unloaded properly, which can affect other tests
   )
 
-lazy val httpVerbsPlay26: Project = Project("http-verbs-play-26", file("http-verbs-play-26"))
+lazy val httpVerbsPlay26 = Project("http-verbs-play-26", file("http-verbs-play-26"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
@@ -63,7 +80,10 @@ lazy val httpVerbsPlay26: Project = Project("http-verbs-play-26", file("http-ver
     libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay26 ++ AppDependencies.testCommon ++ AppDependencies.testPlay26,
     unmanagedSourceDirectories in Compile += (httpVerbsCommon / Compile / scalaSource).value,
     unmanagedSourceDirectories in Test += (httpVerbsCommon / Test / scalaSource).value,
-    unmanagedClasspath in Compile += file(httpVerbsCommon.base.getAbsolutePath + "/target/scala-2.11/classes"),
+    unmanagedClasspath in Compile ++= {
+      val cp = (httpVerbsCommon / Compile / unmanagedClasspath).value.map(_.data)
+      if(intelliJCompat) cp else Seq.empty
+    },
     Test / fork := true // akka is not unloaded properly, which can affect other tests
   )
 
