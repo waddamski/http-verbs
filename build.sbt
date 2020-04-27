@@ -37,8 +37,13 @@ lazy val library = (project in file("."))
 
 lazy val httpVerbsCommon = Project("http-verbs-common", file("http-verbs-common"))
   .disablePlugins(SbtGitVersioning)
+  .settings(
+    commonSettings,
+    libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay26,
+    unmanagedClasspath in Compile += file(httpVerbsPlay26.base.getAbsolutePath + "/target/scala-2.11/classes")
+  )
 
-lazy val httpVerbsPlay25 = Project("http-verbs-play-25", file("http-verbs-play-25"))
+lazy val httpVerbsPlay25: Project = Project("http-verbs-play-25", file("http-verbs-play-25"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
@@ -46,10 +51,11 @@ lazy val httpVerbsPlay25 = Project("http-verbs-play-25", file("http-verbs-play-2
     unmanagedSourceDirectories in Test += (httpVerbsCommon / Test / scalaSource).value,
     crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay25 ++ AppDependencies.testCommon ++ AppDependencies.testPlay25,
+    unmanagedClasspath in Compile += file(httpVerbsCommon.base.getAbsolutePath + "/target/scala-2.11/classes"),
     Test / fork := true // akka is not unloaded properly, which can affect other tests
   )
 
-lazy val httpVerbsPlay26 = Project("http-verbs-play-26", file("http-verbs-play-26"))
+lazy val httpVerbsPlay26: Project = Project("http-verbs-play-26", file("http-verbs-play-26"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
@@ -57,6 +63,7 @@ lazy val httpVerbsPlay26 = Project("http-verbs-play-26", file("http-verbs-play-2
     libraryDependencies ++= AppDependencies.compileCommon ++ AppDependencies.compilePlay26 ++ AppDependencies.testCommon ++ AppDependencies.testPlay26,
     unmanagedSourceDirectories in Compile += (httpVerbsCommon / Compile / scalaSource).value,
     unmanagedSourceDirectories in Test += (httpVerbsCommon / Test / scalaSource).value,
+    unmanagedClasspath in Compile += file(httpVerbsCommon.base.getAbsolutePath + "/target/scala-2.11/classes"),
     Test / fork := true // akka is not unloaded properly, which can affect other tests
   )
 
