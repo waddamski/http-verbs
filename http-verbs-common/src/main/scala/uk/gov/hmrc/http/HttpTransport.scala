@@ -64,14 +64,24 @@ trait PutHttpTransport {
 }
 
 trait PostHttpTransport {
+  def doPost2[A](
+    url: String,
+    body: A,
+    headers: Seq[(String, String)] = Seq.empty)(
+      implicit writes: HttpWrites[A],
+      hc: HeaderCarrier,
+      ec: ExecutionContext): Future[HttpResponse]
+
+  @deprecated("Use doPost2 instead.", "2.11.0")
   def doPost[A](
     url: String,
     body: A,
     headers: Seq[(String, String)] = Seq.empty)(
-      implicit wts: Writes[A],
+      implicit writes: Writes[A],
       hc: HeaderCarrier,
       ec: ExecutionContext): Future[HttpResponse]
 
+  @deprecated("Use doPost2 instead.", "2.11.0")
   def doPostString(
     url: String,
     body: String,
@@ -79,12 +89,14 @@ trait PostHttpTransport {
       implicit hc: HeaderCarrier,
       ec: ExecutionContext): Future[HttpResponse]
 
+  @deprecated("Use doPost2 instead.", "2.11.0")
   def doEmptyPost[A](
     url: String,
     headers: Seq[(String, String)] = Seq.empty)(
       implicit hc: HeaderCarrier,
       ec: ExecutionContext): Future[HttpResponse]
 
+  @deprecated("Use doPost2 instead.", "2.11.0")
   def doFormPost(
     url: String,
     body: Map[String, Seq[String]],
@@ -166,6 +178,16 @@ trait CorePut {
 }
 
 trait CorePost {
+  def POST2[I, O](
+    url: String,
+    body: I,
+    headers: Seq[(String, String)] = Seq.empty)(
+      implicit wts: HttpWrites[I],
+      rds: HttpReads[O],
+      hc: HeaderCarrier,
+      ec: ExecutionContext): Future[O]
+
+  @deprecated("Use POST2 instead.", "2.11.0")
   def POST[I, O](
     url: String,
     body: I,
@@ -175,6 +197,7 @@ trait CorePost {
       hc: HeaderCarrier,
       ec: ExecutionContext): Future[O]
 
+  @deprecated("Use POST2 instead.", "2.11.0")
   def POSTString[O](
     url: String,
     body: String,
@@ -183,6 +206,7 @@ trait CorePost {
       hc: HeaderCarrier,
       ec: ExecutionContext): Future[O]
 
+  @deprecated("Use POST2 instead.", "2.11.0")
   def POSTForm[O](
     url: String,
     body: Map[String, Seq[String]],
@@ -191,6 +215,7 @@ trait CorePost {
       hc: HeaderCarrier,
       ec: ExecutionContext): Future[O]
 
+  @deprecated("Use POST2 instead.", "2.11.0")
   def POSTEmpty[O](
     url: String,
     headers: Seq[(String, String)] = Seq.empty)(

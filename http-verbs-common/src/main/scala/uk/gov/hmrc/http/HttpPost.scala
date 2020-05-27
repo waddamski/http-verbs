@@ -31,6 +31,22 @@ trait HttpPost
     with HttpHooks
     with Retries {
 
+  override def POST2[I, O](
+    url: String,
+    body: I,
+    headers: Seq[(String, String)])(
+      implicit wts: HttpWrites[I],
+      rds: HttpReads[O],
+      hc: HeaderCarrier,
+      ec: ExecutionContext): Future[O] =
+    withTracing(POST_VERB, url) {
+      val httpResponse = retry(POST_VERB, url)(doPost2(url, body, headers))
+      executeHooks(url, POST_VERB, wts.writeForHook(body).toOptionAny, httpResponse)
+      mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
+    }
+
+
+  @deprecated("Use POST2 instead.", "11.0.0")
   override def POST[I, O](
     url: String,
     body: I,
@@ -45,6 +61,7 @@ trait HttpPost
       mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
     }
 
+  @deprecated("Use POST2 instead.", "11.0.0")
   override def POSTString[O](
     url: String,
     body: String,
@@ -58,6 +75,7 @@ trait HttpPost
       mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
     }
 
+  @deprecated("Use POST2 instead.", "11.0.0")
   override def POSTForm[O](
     url: String,
     body: Map[String, Seq[String]],
@@ -71,6 +89,7 @@ trait HttpPost
       mapErrors(POST_VERB, url, httpResponse).map(rds.read(POST_VERB, url, _))
     }
 
+  @deprecated("Use POST2 instead.", "11.0.0")
   override def POSTEmpty[O](
     url: String,
     headers: Seq[(String, String)])(

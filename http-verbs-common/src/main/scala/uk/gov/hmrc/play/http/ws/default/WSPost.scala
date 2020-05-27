@@ -18,7 +18,7 @@ package uk.gov.hmrc.play.http.ws.default
 
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.WSRequest
-import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse, PostHttpTransport}
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse, HttpWrites, PostHttpTransport}
 import uk.gov.hmrc.play.http.ws.{WSExecute, WSHttpResponse, WSRequestBuilder}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,18 +27,31 @@ trait WSPost extends CorePost with PostHttpTransport with WSRequestBuilder with 
 
   def withEmptyBody(request: WSRequest): WSRequest
 
+  override def doPost2[A](
+    url: String,
+    body: A,
+    headers: Seq[(String, String)]
+  )(
+    implicit writes: HttpWrites[A],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[HttpResponse] =
+    execute(buildRequest(url, headers).withBody(writes.write(body)), "POST")
+      .map(WSHttpResponse.apply)
+
+  @deprecated("Use doPost2 instead", "11.0.0")
   override def doPost[A](
     url: String,
     body: A,
     headers: Seq[(String, String)]
   )(
-    implicit rds: Writes[A],
+    implicit wts: Writes[A],
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[HttpResponse] =
-    execute(buildRequest(url, headers).withBody(Json.toJson(body)), "POST")
-      .map(WSHttpResponse.apply)
+    doPost2[A](url, body, headers)
 
+  @deprecated("Use doPost2 instead", "11.0.0")
   override def doFormPost(
     url: String,
     body: Map[String, Seq[String]],
@@ -47,9 +60,9 @@ trait WSPost extends CorePost with PostHttpTransport with WSRequestBuilder with 
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[HttpResponse] =
-    execute(buildRequest(url, headers).withBody(body), "POST")
-      .map(WSHttpResponse.apply)
+    doPost2[Map[String, Seq[String]]](url, body, headers)
 
+  @deprecated("Use doPost2 instead", "11.0.0")
   override def doPostString(
     url: String,
     body: String,
@@ -58,9 +71,9 @@ trait WSPost extends CorePost with PostHttpTransport with WSRequestBuilder with 
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[HttpResponse] =
-    execute(buildRequest(url, headers).withBody(body), "POST")
-      .map(WSHttpResponse.apply)
+    doPost2[String](url, body, headers)
 
+  @deprecated("Use doPost2 instead", "11.0.0")
   override def doEmptyPost[A](
     url: String,
     headers: Seq[(String, String)]
@@ -68,6 +81,5 @@ trait WSPost extends CorePost with PostHttpTransport with WSRequestBuilder with 
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[HttpResponse] =
-    execute(withEmptyBody(buildRequest(url, headers)), "POST")
-      .map(WSHttpResponse.apply)
+    doPost2[Unit](url, (), headers)
 }
