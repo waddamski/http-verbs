@@ -18,8 +18,9 @@ package uk.gov.hmrc.http
 
 import play.api.http.Writeable
 import play.api.libs.json.{Json, JsValue, Writes => JsonWrites}
-import play.api.libs.ws.{InMemoryBody, WSBody}
+import play.api.libs.ws.WSRequest
 import play.api.mvc.Results
+
 
 import com.github.ghik.silencer.silent
 
@@ -27,10 +28,10 @@ trait HttpWritesInstances {
 
   implicit val fromJson: HttpWrites[JsValue] =
     new HttpWrites[JsValue] {
-      override def write(b: JsValue): WSBody =
-        InMemoryBody(implicitly[Writeable[JsValue]].transform(b))
+      override def write(wsRequest: WSRequest, b: JsValue): WSRequest =
+        wsRequest.withBody(b)
 
-      override def writeForHook(b: JsValue): HookData =
+      override def toHookData(b: JsValue): HookData =
         HookDataString(Json.stringify(b))
     }
 
@@ -40,28 +41,28 @@ trait HttpWritesInstances {
 
   implicit val fromString: HttpWrites[String] =
     new HttpWrites[String] {
-      override def write(b: String): WSBody =
-        InMemoryBody(implicitly[Writeable[String]].transform(b))
+      override def write(wsRequest: WSRequest, b: String): WSRequest =
+        wsRequest.withBody(b)
 
-      override def writeForHook(b: String): HookData =
+      override def toHookData(b: String): HookData =
         HookDataString(b)
     }
 
   implicit val fromForm: HttpWrites[Map[String, Seq[String]]] =
     new HttpWrites[Map[String, Seq[String]]] {
-      override def write(b: Map[String, Seq[String]]): WSBody =
-        InMemoryBody(implicitly[Writeable[Map[String, Seq[String]]]].transform(b))
+      override def write(wsRequest: WSRequest, b: Map[String, Seq[String]]): WSRequest =
+        wsRequest.withBody(b)
 
-      override def writeForHook(b: Map[String, Seq[String]]): HookData =
+      override def toHookData(b: Map[String, Seq[String]]): HookData =
         HookDataMap(b)
     }
 
   implicit val fromEmpty: HttpWrites[Unit] =
     new HttpWrites[Unit] {
-      override def write(b: Unit): WSBody =
-        InMemoryBody(implicitly[Writeable[Results.EmptyContent]].transform(Results.EmptyContent()))
+      override def write(wsRequest: WSRequest, b: Unit): WSRequest =
+        wsRequest.withBody(Results.EmptyContent())
 
-      override def writeForHook(b: Unit): HookData =
+      override def toHookData(b: Unit): HookData =
         HookDataEmpty
     }
 }

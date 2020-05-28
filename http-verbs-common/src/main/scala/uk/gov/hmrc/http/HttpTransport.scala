@@ -77,7 +77,7 @@ trait PostHttpTransport {
     url: String,
     body: A,
     headers: Seq[(String, String)] = Seq.empty)(
-      implicit writes: Writes[A],
+      implicit wts: Writes[A],
       hc: HeaderCarrier,
       ec: ExecutionContext): Future[HttpResponse]
 

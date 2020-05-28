@@ -36,7 +36,7 @@ trait WSPost extends CorePost with PostHttpTransport with WSRequestBuilder with 
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[HttpResponse] =
-    execute(buildRequest(url, headers).withBody(writes.write(body)), "POST")
+    execute(writes.write(buildRequest(url, headers), body), "POST")
       .map(WSHttpResponse.apply)
 
   @deprecated("Use doPost2 instead", "11.0.0")
