@@ -16,60 +16,56 @@
 
 package uk.gov.hmrc.http
 
-import com.github.ghik.silencer.silent
 import org.scalacheck.Gen
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.TryValues
+import org.scalatest.EitherValues
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import scala.util.Try
 
-@silent("deprecated")
 class HttpErrorFunctionsSpec
     extends AnyWordSpec
     with Matchers
     with ScalaCheckDrivenPropertyChecks
     with TableDrivenPropertyChecks
-    with TryValues {
+    with EitherValues {
 
   "HttpErrorFunctions" should {
-    "return the response if the status code is between 200 and 299" in new HttpErrorFunctions {
-      forAll(Gen.choose(200, 299)) { statusCode: Int =>
-        val expectedResponse = HttpResponse(statusCode, "")
-        handleResponse(exampleVerb, exampleUrl)(expectedResponse) should be(expectedResponse)
+    "return an UpstreamErrorResponse if the status code is between 400 and 499" in new HttpErrorFunctions {
+      forAll(Gen.choose(400, 499)) { statusCode: Int =>
+        val expectedResponse = HttpResponse(statusCode, exampleBody)
+        val r = handleResponseEither(exampleVerb, exampleUrl)(expectedResponse)
+        val error = handleResponseEither(exampleVerb, exampleUrl)(expectedResponse).left.value
+        error.getMessage should (include(exampleUrl) and include(exampleVerb) and include(expectedResponse.body))
+        error should have('statusCode (statusCode))
       }
     }
 
-    "return the correct exception if the status code is 400" in {
-      expectA[BadRequestException](forStatus = 400)
+    "return an UpstreamErrorResponse if the status code is between 500 and 599" in new HttpErrorFunctions {
+      forAll(Gen.choose(500, 599)) { statusCode: Int =>
+        val expectedResponse = HttpResponse(statusCode, exampleBody)
+        val error = handleResponseEither(exampleVerb, exampleUrl)(expectedResponse).left.value
+        error.getMessage should (include(exampleUrl) and include(exampleVerb) and include(expectedResponse.body))
+        error should have('statusCode (statusCode))
+      }
     }
 
-    "return the correct exception if the status code is 404" in {
-      expectA[NotFoundException](forStatus   = 404)
-    }
+    "return the response if the status code is outside 400 and 599" in new HttpErrorFunctions {
+      forAll(Gen.choose(0, 399)) { statusCode: Int =>
+        val expectedResponse = HttpResponse(statusCode, "")
+        handleResponseEither(exampleVerb, exampleUrl)(expectedResponse) shouldBe Right(expectedResponse)
+      }
 
-    "return the correct exception for all other status codes" in {
-      forAll(Gen.choose(0, 199))(expectA[Exception](_))
-      forAll(Gen.choose(400, 499).suchThat(!Seq(400, 404).contains(_)))(expectA[Upstream4xxResponse](_, Some(500)))
-      forAll(Gen.choose(500, 599))(expectA[Upstream5xxResponse](_, Some(502)))
-      forAll(Gen.choose(600, 1000))(expectA[Exception](_))
+      forAll(Gen.choose(600, 1000)) { statusCode: Int =>
+        val expectedResponse = HttpResponse(statusCode, "")
+        handleResponseEither(exampleVerb, exampleUrl)(expectedResponse) shouldBe Right(expectedResponse)
+      }
     }
   }
 
   val exampleVerb = "GET"
   val exampleUrl  = "http://example.com/something"
   val exampleBody = "this is the string body"
-
-  def expectA[T: Manifest](forStatus: Int, reportStatus: Option[Int] = None): Unit = new HttpErrorFunctions {
-    val e =
-      Try(handleResponse(exampleVerb, exampleUrl)(HttpResponse(forStatus, exampleBody))).failure.exception
-    e            should be(a[T])
-    e.getMessage should (include(exampleUrl) and include(exampleVerb) and include(exampleBody))
-    reportStatus.map { s =>
-      e should have('upstreamResponseCode (forStatus))
-      e should have('reportAs (s))
-    }
-  }
 }

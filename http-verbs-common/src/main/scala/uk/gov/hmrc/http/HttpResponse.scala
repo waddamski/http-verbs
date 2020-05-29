@@ -21,26 +21,15 @@ import play.api.libs.json.{JsValue, Json}
 
 /**
   * The ws.Response class is very hard to dummy up as it wraps a concrete instance of
-  * the ning http Response. This trait exposes just the bits of the response that we
+  * the ning http Response. This case class exposes just the bits of the response that we
   * need in methods that we are passing the response to for processing, making it
   * much easier to provide dummy data in our specs.
   */
-// This trait will be replaced with a case class (Which will remove coupling to specific types, enable `.copy` etc (useful for testing))
-// To not break clients, we will discourage use of extending HttpResponse, rather use the apply functions. We will be able to introduce
-// the case class afterwards.
-trait HttpResponse {
-  def status: Int
-
-  def body: String
-
-  @deprecated("For reading use headers instead. If setting, use HttpResponse.apply instead. You should not extend HttpResponse, but create instances with HttpResponse.apply", "11.0.0")
-  def allHeaders: Map[String, Seq[String]]
-
-  // final to help migrate away from allHeaders (i.e. read only - set via HttpResponse.apply)
-  @silent("deprecated")
-  final def headers: Map[String, Seq[String]]
-    = allHeaders
-
+case class HttpResponse(
+  status : Int,
+  body   : String,
+  headers: Map[String, Seq[String]]
+) {
   def json: JsValue =
     Json.parse(body)
 
@@ -52,19 +41,6 @@ trait HttpResponse {
 }
 
 object HttpResponse {
-  @deprecated("Use alternative HttpResponse.apply functions instead", "11.0.0")
-  def apply(
-    responseStatus : Int,
-    responseJson   : Option[JsValue]          = None,
-    responseHeaders: Map[String, Seq[String]] = Map.empty,
-    responseString : Option[String]           = None
-  ) = new HttpResponse {
-    override def status    : Int                      = responseStatus
-    override def body      : String                   = responseString.orElse(responseJson.map(Json.prettyPrint)).orNull
-    override def allHeaders: Map[String, Seq[String]] = responseHeaders
-    override def json      : JsValue                  = responseJson.orNull
-  }
-
   def apply(
     status : Int,
     body   : String
@@ -77,35 +53,12 @@ object HttpResponse {
 
   def apply(
     status : Int,
-    body   : String,
-    headers: Map[String, Seq[String]]
-  ): HttpResponse = {
-    val pStatus  = status
-    val pBody    = body
-    val pHeaders = headers
-    new HttpResponse {
-      override def status    : Int                      = pStatus
-      override def body      : String                   = pBody
-      override def allHeaders: Map[String, Seq[String]] = pHeaders
-    }
-  }
-
-  def apply(
-    status : Int,
     json   : JsValue,
     headers: Map[String, Seq[String]]
-  ): HttpResponse = {
-    val pStatus  = status
-    val pJson    = json
-    val pHeaders = headers
-    new HttpResponse {
-      override def status    : Int                      = pStatus
-      override def body      : String                   = Json.prettyPrint(pJson)
-      override def allHeaders: Map[String, Seq[String]] = pHeaders
-      override def json      : JsValue                  = pJson
-    }
-  }
-
-  def unapply(that: HttpResponse): Option[(Int, String, Map[String, Seq[String]])] =
-    Some((that.status, that.body, that.headers))
+  ): HttpResponse =
+    apply(
+      status  = status,
+      body    = Json.prettyPrint(json),
+      headers = headers
+    )
 }
