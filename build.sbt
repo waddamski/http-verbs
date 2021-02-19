@@ -15,7 +15,9 @@ lazy val commonSettings = Seq(
   organization := "uk.gov.hmrc",
   majorVersion := 13,
   scalaVersion := scala2_12,
-  makePublicallyAvailableOnBintray := true,
+  makePublicallyAvailableOnBintray := false,
+  publishMavenStyle                := true,
+  publishTo                        := Some("PBD-3014 Spike Snapshots" at "s3://pbd-3014-spike/snapshots"),
   scalacOptions ++= Seq("-feature"),
   libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
